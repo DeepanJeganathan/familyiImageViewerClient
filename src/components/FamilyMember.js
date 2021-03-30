@@ -99,7 +99,7 @@ function FamilyMember({ addOrEdit }) {
 
   return (
     <>
-      <Card>
+      <Card className="form">
         {" "}
         <Form autoComplete="off" noValidate onSubmit={HandleSubmit}>
           <Card.Img variant="top" src={formValues.imageSrc} />
