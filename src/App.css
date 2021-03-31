@@ -47,7 +47,7 @@
   min-height: 100%;
 }
 
-.form{
+.form, .family-list-container{
   -webkit-box-shadow: 13px -3px 16px -1px rgba(0,0,0,0.19); 
   box-shadow: 13px -3px 16px -1px rgba(0,0,0,0.19);
 }
@@ -58,7 +58,8 @@ box-shadow: 6px -3px 17px 1px rgba(0,0,0,0.35);
 }
 
 /* card customization */
-.card{box-shadow: none;
+.card{  -webkit-box-shadow: 13px -3px 16px -1px rgba(0,0,0,0.19); 
+  box-shadow: 13px -3px 16px -1px rgba(0,0,0,0.19);
 
 transition: box-shadow 1s ;}
 
@@ -68,6 +69,7 @@ box-shadow: 8px 7px 11px -1px rgba(20,39,153,0.83);
 }
 .deleteOrEdit{
   display: none;
+  position:relative;
  
 }
 
@@ -78,6 +80,7 @@ box-shadow: 8px 7px 11px -1px rgba(20,39,153,0.83);
 }
 .deleteOrEdit:hover{
   display: block;
+ 
  
 }
 

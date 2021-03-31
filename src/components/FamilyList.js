@@ -1,77 +1,84 @@
 import { useEffect, useState } from "react";
-import { Card, CardDeck, Col, Container, Jumbotron, Row } from "react-bootstrap";
+import { Card,  Col, Container, Jumbotron, Row } from "react-bootstrap";
 import FamilyMember from "./FamilyMember";
 
 import axios from "axios";
 
 function FamilyList() {
-
-  useEffect(() => {
-    refresh();
-  }, [])
   const [formData, setFormData] = useState([]);
+  const [updateData, setUpdateData]= useState(null);
 
-  const addOrEdit = (formData, onSuccess) => {
-    console.log("reached form submission function")
-    if (parseInt(formData.get('familyId')) === 0) {
-      familyApi().create(formData)
+  useEffect(() => { refresh()
+ 
+  }, [])
+
+
+
+  const addOrEdit = (form, onSuccess) => {
+    if (form.get('familyId') === "0") {
+      familyApi().create(form)
         .then(res => {
-          console.log(res.data)
-          onSuccess()
+          console.log("reached create")
+          refresh();
+          onSuccess();
         }).catch(err => console.log(err.response))
     }
-    else {
-      familyApi().update(formData.get('familyId'))
+    else {    
+      console.log(parseInt(form.get('familyId')));
+      familyApi().update(form.get('familyId'),form)
         .then(res => {
-          console.log(res.data)
+          console.log("reached update")
+          refresh();
           onSuccess()
         }).catch(err => console.log(err.response))
     }
 
   };
 
-  const familyApi = (url = "https://localhost:44330/api/FamilyImageViewer/") => {
+  //url = "http://localhost:44330/api/FamilyImageViewer/"
+  const familyApi = (url = "http://localhost:52046/api/FamilyImageViewer/") => {
     return {
       fetchAll: () => axios.get(url),
       create: newMember => axios.post(url, newMember),
-      update: (id, updateMember) => axios.put(url + id.updateMember),
+      update: (id, updateMember) => axios.put(url + id),
       delete: id => axios.delete(url + id)
     }
-
       ;
   }
 
-  let dataSet = [{ "familyId": 1, "familyFirstName": "john", "familyLastName": "doe", "birthDate": "1998-10-02T00:00:00", "relation": "brother", "quote": "\"hello this is a test\"", "imageName": null, "imageFile": null }, { "familyId": 1, "familyFirstName": "john", "familyLastName": "doe", "birthDate": "1998-10-02T00:00:00", "relation": "brother", "quote": "\"hello this is a test\"", "imageName": null, "imageFile": null }];
-  function refresh() { console.log('refresh function hit'); familyApi().fetchAll().then(res => dataSet = res.data).catch(err => console.log(err.data)); }
 
+  function refresh()
+   { 
+    familyApi().fetchAll()
+   .then(res => setFormData(res.data))
+   .catch(err => console.log(err.data)) 
+  }
 
-
-
+function HandleEdit(x){
+  axios.get("http://localhost:52046/api/FamilyImageViewer/"+ x.target.id)
+  .then(res=>setUpdateData(res.data))
+  .catch(err=>console.log(err.response))
+}
 
 
   const listOfMembers = () =>
-    dataSet.map((x, i) => {
+    formData.map((x, i) => {
       return (
-
-
-
-
-        <Col xs={6} key={i}>
-          <Card border="light"  >
+        <Col xs={12} md={6} key={i}>
+          <Card className='m-2 ' border="light"  >
             <div className="card-content">
               <Card.Img variant="top" src="holder.js/100px160" />
               <Card.Body>
-                <Card.Title> {x.familyFirstName} {x.familyLastName}</Card.Title>
+                <Card.Title>  {x.familyLastName}</Card.Title>
                 <Card.Text>
                   {x.quote}
                 </Card.Text>
               </Card.Body>
               <Card.Footer>
                 <small className="text-muted">{x.relation}</small>
-
               </Card.Footer>
             </div>
-            <div className="deleteOrEdit" > <i className=" text-secondary fas fa-edit"></i><i className=" text-secondary ml-2 far fa-trash-alt"></i></div>
+            <div className="deleteOrEdit" > <i id={x.familyId} onClick={HandleEdit} className=" text-secondary fas fa-edit"></i><i className=" text-secondary ml-2 far fa-trash-alt"></i></div>
 
           </Card>
         </Col>
@@ -88,10 +95,10 @@ function FamilyList() {
           </Container>
         </Jumbotron>
       </Col>
-      <Col xs={4}>
-        <FamilyMember addOrEdit={addOrEdit} />
+      <Col xs={5}>
+        <FamilyMember updateData={updateData} addOrEdit={addOrEdit} />
       </Col>
-      <Col className=" form" xs={8}>
+      <Col className=" family-list-container" xs={7}>
         <h4>Members</h4>
         <hr></hr>
 

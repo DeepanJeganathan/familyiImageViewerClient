@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 
 const defaultImg =
@@ -17,10 +17,19 @@ const initalValues = {
 };
 
 
-function FamilyMember({ addOrEdit }) {
-  const [errors, setErrors] = useState({});
+function FamilyMember({ updateData, addOrEdit }) {
 
+  const [errors, setErrors] = useState({});
   const [formValues, setFormValues] = useState(initalValues);
+ 
+  useEffect(()=>{
+    if(updateData!=null){
+      setFormValues(updateData);   
+    }
+    
+  },[updateData])
+
+
 
   function ResetForms(){
     setFormValues(initalValues);
@@ -29,11 +38,12 @@ function FamilyMember({ addOrEdit }) {
     document.getElementById('image-uploader').value=null;
   }
 
+  //get name value from e.target
   function HandleChange(e) {
     const { name, value } = e.target;
-
     setFormValues({ ...formValues, [name]: value });
   }
+
 
   function ShowPreview(e) {
     if (e.target.files && e.target.files[0]) {
@@ -56,19 +66,19 @@ function FamilyMember({ addOrEdit }) {
       });
     }
   }
+
   function ValidateFields() {
     let fieldValues = {};
-    fieldValues.familyFirstName =
-      formValues.familyFirstName === "" ? false : true;
+    fieldValues.familyFirstName = formValues.familyFirstName === "" ? false : true;
     fieldValues.imageSrc = formValues.imageSrc === defaultImg ? false : true;
     setErrors(fieldValues);
     console.log(errors);
     return Object.values(fieldValues).every((x) => x === true);
   }
+  
   function HandleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault(); 
     if (ValidateFields()) {
-      
         const formData=new FormData();
         formData.append('familyId', formValues.familyId)
         formData.append('familyFirstName', formValues.familyFirstName)
@@ -82,9 +92,9 @@ function FamilyMember({ addOrEdit }) {
       addOrEdit(formData,ResetForms);
      
       console.log(
-        `form values are now set to${console.log(
+        `form values are now set to ${console.log(
           formValues
-        )}, errors are now reset to${console.log(errors)}`
+        )}, errors are now reset to ${console.log(errors)}`
       );
     } else {
       console.log("validation failed");
@@ -171,6 +181,9 @@ function FamilyMember({ addOrEdit }) {
             </Form.Group>
             <Button variant="primary" type="submit">
               Submit
+            </Button>
+            <Button className="ml-2 px-3" variant="secondary" type="button">
+              Clear
             </Button>
           </Card.Body>
         </Form>
