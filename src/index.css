@@ -6,7 +6,8 @@ body {
     sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
- 
+  min-width: 800px;
+  
 }
 
 code {
@@ -19,4 +20,13 @@ code {
   border-color: red !important;
   color: rgb(245, 97, 97);
   background-color: silver;
+}
+
+/* jumbotron */
+.jumbotron{
+box-shadow:
+
+0 0 50px #fff,            /* outer white */
+-4px 0 20px rgb(0, 17, 255),        /* outer left magenta */
+7px 0 20px rgb(78, 240, 252);         /* outer right cyan */
 }

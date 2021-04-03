@@ -24,7 +24,8 @@ function FamilyMember({ updateData, addOrEdit }) {
  
   useEffect(()=>{
     if(updateData!=null){
-      setFormValues(updateData);   
+      setFormValues(updateData); 
+      console.log(formValues)
     }
     
   },[updateData])
@@ -46,6 +47,9 @@ function FamilyMember({ updateData, addOrEdit }) {
 
 
   function ShowPreview(e) {
+    console.log("showpreviewfunc")
+    console.log(e.target.files[0])
+   
     if (e.target.files && e.target.files[0]) {
       let imgFile = e.target.files[0];
       //get virtual path to show image preview use filereader built in function
@@ -89,6 +93,7 @@ function FamilyMember({ updateData, addOrEdit }) {
         formData.append('imageName', formValues.imageName)
         formData.append('imageSrc', formValues.imageSrc)
         formData.append('imageFile', formValues.imageFile)
+     
       addOrEdit(formData,ResetForms);
      
       console.log(
@@ -112,11 +117,12 @@ function FamilyMember({ updateData, addOrEdit }) {
       <Card className="form">
         {" "}
         <Form autoComplete="off" noValidate onSubmit={HandleSubmit}>
-          <Card.Img variant="top" src={formValues.imageSrc} />
+          <Card.Img style={{width:'80%', margin:'5px'}} variant="top" src={formValues.imageSrc} />
 
           <Card.Body>
             <Form.Group>
               <Form.File
+              
               id="image-uploader"
                 accept="image/*"
                 className={applyErrorClass("imageSrc")}
@@ -133,6 +139,7 @@ function FamilyMember({ updateData, addOrEdit }) {
                 value={formValues.familyFirstName}
                 onChange={HandleChange}
               />
+              
             </Form.Group>
             <Form.Group>
               <Form.Label>Last Name</Form.Label>
