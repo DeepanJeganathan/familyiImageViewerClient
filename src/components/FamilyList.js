@@ -1,83 +1,94 @@
 import { useEffect, useState } from "react";
-import { Card,  Col, Container, Jumbotron, Row } from "react-bootstrap";
+import { Card, Col, Container, Jumbotron, Row } from "react-bootstrap";
 import FamilyMember from "./FamilyMember";
+import { fetch_members,  post } from '../redux/member/memberActions'
+import { useSelector, useDispatch } from 'react-redux'
+import Error from './Error'
+import Loading from './Loading'
 
 import axios from "axios";
 
 function FamilyList() {
-  const [formData, setFormData] = useState([]);
-  const [updateData, setUpdateData]= useState(null);
 
-  useEffect(() => { refresh()
- 
-  },[] )
+  const [updateData, setUpdateData] = useState(null)
+
+  const members = useSelector(state => state)
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    
+    dispatch(fetch_members())
+  }, [])
 
 
 
   const addOrEdit = (form, onSuccess) => {
-    console.log(form)
     if (form.get('familyId') === "0") {
-      familyApi().create(form)
-        .then(res => {
-          console.log("reached create")
-          refresh();
-          onSuccess();
-        }).catch(err => console.log(err.response))
-    }
-    else {   
-      console.log("update func") 
-      console.log(form.get('imageFile'))
-      familyApi().update(form.get('familyId'),form)
-        .then(res => {
-          console.log("reached update")
-          refresh();
-          onSuccess()
-        }).catch(err => console.log(err.response))
-    }
+      dispatch(post(form))
 
-  };
-  //url = "http://localhost:52046/api/FamilyImageViewer/"
-
-  //url = "http://localhost:44330/api/FamilyImageViewer/"
-  const familyApi = (url = "http://192.168.0.105:8087/api/FamilyImageViewer/") => {
-    return {
-      fetchAll: () => axios.get(url),
-      create: newMember => axios.post(url, newMember),
-      update: (id, updateMember) => axios.put(url + id,updateMember),
-      delete: id => axios.delete(url + id)
+      if (members.post_success) {
+        onSuccess();
+      }
     }
-      ;
+    // else {
+    //   console.log("update func")
+    //   console.log(form.get('imageFile'))
+    //   familyApi().update(form.get('familyId'),form)
+    //     .then(res => {
+    //       console.log("reached update")
+    //       refresh();
+    //       onSuccess()
+    //     }).catch(err => console.log(err.response))
+    // }
+
+    // console.log(form)
+    // if (form.get('familyId') === "0") {
+    //   familyApi().create(form)
+    //     .then(res => {
+    //       console.log("reached create")
+    //       refresh();
+    //       onSuccess();
+    //     }).catch(err => console.log(err.response))
+    // }
+    // else {
+    //   console.log("update func")
+    //   console.log(form.get('imageFile'))
+    //   familyApi().update(form.get('familyId'),form)
+    //     .then(res => {
+    //       console.log("reached update")
+    //       refresh();
+    //       onSuccess()
+    //     }).catch(err => console.log(err.response))
+    // }
+
   }
 
 
-  function refresh()
-   { 
-    familyApi().fetchAll()
-   .then(res => setFormData(res.data))
-   .catch(err => console.log(err.data)) 
+  function refresh() {
+    dispatch(fetch_members());
   }
 
-function HandleEdit(x){
-  axios.get("http://192.168.0.105:8087/api/FamilyImageViewer/"+ x.target.id)
-  .then(res=>setUpdateData(res.data))
-  .catch(err=>console.log(err.response))
-}
-function HandleDelete(x){
-familyApi().delete(x.target.id).then(res=> refresh()).catch(err=>console.log(err.response))
+  function HandleEdit(x) {
+    axios.get("http://192.168.0.105:8087/api/FamilyImageViewer/" + x.target.id)
+      .then(res => setUpdateData(res.data))
+      .catch(err => console.log(err.response))
+  }
+  function HandleDelete(x) {
+    // familyApi().delete(x.target.id).then(res => refresh()).catch(err => console.log(err.response))
 
-}
-function GetAge(birthDate){
- 
- return Math.floor((new Date()-new Date(birthDate).getTime())/3.15576e+10)
-}
+  }
+  function GetAge(birthDate) {
+
+    return Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e+10)
+  }
 
 
-  const listOfMembers = () =>
- 
-    formData.map((x, i) => {
-     
+  const listOfMembers = () => {
+   
+   return  members.data.map((x, i) => {
       return (
-        <Col  xs={12} md={6} key={i}>
+        <Col xs={12} md={6} key={i}>
           <Card className='m-2' border="light"  >
             <div className="card-content">
               <Card.Img variant="top" src={x.imageSrc} />
@@ -91,12 +102,18 @@ function GetAge(birthDate){
                 <small className="text-muted">{x.relation}</small>
               </Card.Footer>
             </div>
-            <div className="deleteOrEdit" > <i id={x.familyId} onClick={HandleEdit}  className=" text-secondary fas fa-edit"></i><i onClick={HandleDelete} id={x.familyId} className=" text-secondary ml-2 far fa-trash-alt"></i></div>
+            <div className="deleteOrEdit" > <i id={x.familyId} onClick={HandleEdit} className=" text-secondary fas fa-edit"></i><i onClick={HandleDelete} id={x.familyId} className=" text-secondary ml-2 far fa-trash-alt"></i></div>
 
           </Card>
         </Col>
-      );
-    });
+      )
+    }
+    )
+  }
+
+  if (members.loading) return <Loading />;
+
+  if (members.error !== '') return <Error msg={members.error} />;
 
   return (
     <>
@@ -117,11 +134,13 @@ function GetAge(birthDate){
 
         <Row>
           {listOfMembers()}
+
+
         </Row>
 
       </Col>
     </>
   );
-}
 
-export default FamilyList;
+}
+export default FamilyList
